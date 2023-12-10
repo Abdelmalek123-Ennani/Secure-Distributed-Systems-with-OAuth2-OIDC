@@ -36,12 +36,20 @@ public class SecurityConfig {
                 .csrf(Customizer.withDefaults())
                 .authorizeHttpRequests(ar->ar.requestMatchers("/","/oauth2Login/**","/webjars/**","/h2-console/**").permitAll())
                 .authorizeHttpRequests(ar->ar.anyRequest().authenticated())
-                .oauth2Login(Customizer.withDefaults())
+                .headers(h->h.frameOptions(fo->fo.disable()))
+                .csrf(csrf->csrf.ignoringRequestMatchers("/h2-console/**"))
+                // to personalize login page
+                .oauth2Login(al->
+                        al.loginPage("/oauth2Login")
+                                .defaultSuccessUrl("/")
+                )
                 .logout((logout) -> logout
                         .logoutSuccessHandler(oidcLogoutSuccessHandler())
                         .logoutSuccessUrl("/").permitAll()
                         .clearAuthentication(true)
                         .deleteCookies("JSESSIONID"))
+                // hande exceptions (like 403 reponse)
+                .exceptionHandling(eh -> eh.accessDeniedPage("/notAuthorized"))
                 .build();
     }
 
