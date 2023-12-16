@@ -3,41 +3,42 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { CustomersComponent } from './customers/customers.component';
-import { ProductsComponent } from './products/products.component';
-import {HttpClient, HttpClientModule} from "@angular/common/http";
-import {KeycloakService} from "keycloak-angular";
-
-
-export function initializeKeycloak(keycloak: KeycloakService) {
-  return () =>
-    keycloak.init({
-      config: {
-        url: 'http://localhost:8080',
-        realm: 'abdelmalek-realm',
-        clientId: 'glsid-bdcc-customer-client'
+import {KeycloakAngularModule, KeycloakService} from "keycloak-angular";
+import {HttpClientModule} from "@angular/common/http";
+import {ProductsComponent} from "./products/products.component";
+import {CustomersComponent} from "./customers/customers.component";
+export function kcFactory(kcService : KeycloakService){
+  return ()=>{
+    kcService.init({
+      config : {
+        realm :"abdelmalek-realm",
+        clientId : "glsid-bdcc-customer-client",
+        url : "http://localhost:8080"
       },
-      initOptions: {
-        onLoad: 'check-sso',
+      initOptions : {
+        onLoad : "check-sso",
+        checkLoginIframe : true,
         silentCheckSsoRedirectUri:
           window.location.origin + '/assets/silent-check-sso.html'
       }
-    });
+    })
+  }
 }
 
 @NgModule({
   declarations: [
     AppComponent,
-    CustomersComponent,
-    ProductsComponent
+    ProductsComponent,
+    CustomersComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
+    KeycloakAngularModule,
     HttpClientModule
   ],
   providers: [
-    {provide: APP_INITIALIZER, deps : [KeycloakService], useFactory : initializeKeycloak, multi: true}
+    {provide : APP_INITIALIZER, deps : [KeycloakService],useFactory : kcFactory, multi : true}
   ],
   bootstrap: [AppComponent]
 })
