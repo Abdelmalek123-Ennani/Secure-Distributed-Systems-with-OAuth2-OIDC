@@ -34,7 +34,6 @@ public class CustomerController {
     }
 
     @GetMapping("/customers")
-    @PreAuthorize("hasAuthority('ADMIN')")
     public String costumers(Model model) {
         List<Customer> customerList= customerRepository.findAll();
         model.addAttribute("customers" , customerList);
@@ -42,6 +41,7 @@ public class CustomerController {
     }
 
     @GetMapping("/products")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String products(Model model) {
         SecurityContext context = SecurityContextHolder.getContext();
         Authentication authentication = context.getAuthentication();
